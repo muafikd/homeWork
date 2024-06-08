@@ -58,6 +58,7 @@ export default {
         inputArg(arg) {
             console.log(arg)
             this.arguments.args[arg.id] = arg.arg
+            console.log(this.arguments)
         },
         async nMessage() { 
             await this.newMessage([this.targetAddress, this.functionName, this.arguments])

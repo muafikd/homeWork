@@ -1,16 +1,17 @@
 import { createStore } from 'vuex'
 const ethers = require("ethers")
 const jsprovider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/BAg7VHxXrlaHOdZZ_oYITAuFbvebX8E9")
+let provider 
 
-import { multisigABI } from '@/contracts/Multisig.abi.js'
-import { targetABI } from '@/contracts/Target.abi.js'
+import { multisigABI } from '../contracts/Multisig.abi.js'
+import { targetABI } from '../contracts/Target.abi.js'
 
 export default createStore({
     state: {
         provider : {},
         address: "",
         chainId: "",
-        admins: ['0x61553cdBB96cfb235be23f466399D119125C5B42', '0xb8DB1e5204012bA53e503f6C6B2ad54Dead498dc', '0xBeED64c44dd4527378276a55454Ab9bD2713bbB9'],
+        admins: ['0x4F9ae982818340D29E34994bAedf128C07e42E2f', '0xb8DB1e5204012bA53e503f6C6B2ad54Dead498dc', '0xBeED64c44dd4527378276a55454Ab9bD2713bbB9'],
         admin: false,
         multisigAddress: '0x8c7011Aed42fA1C0A3F0A490806222A5e574e5b4',
         multisig: {},
@@ -59,7 +60,8 @@ export default createStore({
             })
             
             // создаём провайдера
-            state.provider = new ethers.WebSocketProvider(ethereum)
+            state.provider = new ethers.BrowserProvider(ethereum)
+            provider = new ethers.BrowserProvider(ethereum)
             // получаем параметры сети 
             state.chainId = await window.ethereum.request({ method: 'eth_chainId' });
             console.log("chainId: ", state.chainId )
@@ -121,7 +123,7 @@ export default createStore({
             // const provider = ethers.getDefaultProvider(Number(ethers.toBigInt(state.chainId)))
             state.multisig = new ethers.Contract(state.multisigAddress, multisigABI, jsprovider)
 
-            const nonce = await state.multisig.nonce()
+            const nonce = await state.multisig._nonce()
 
             console.log("nonce: ", nonce)
 
@@ -131,7 +133,8 @@ export default createStore({
                 [nonce, state.multisigAddress, targetAddress, payload]
             ))
 
-            const signer = state.provider.getSigner()
+            const signer = await provider.getSigner()
+            
 
             // Подписываем сообщение
             const rawSignature = await signer.signMessage(message)

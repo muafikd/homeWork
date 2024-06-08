@@ -4,6 +4,7 @@
         <select-type
             @changeType="changeType"
             :options=options
+            v-model="choice"
         />
         <input
             class="input-field"
@@ -43,7 +44,7 @@ export default {
                 id: this.id,
                 type: type
             }
-            this.$emit("changeTypes", types)
+            this.$emit("changeType", types)
         }
     },
     watch: {
